@@ -1,66 +1,63 @@
-// Utilities
 import { defineStore } from 'pinia'
-import router from "@/router";
 
 export interface Request {
-  type: String
-  parcelType: String
+  type: string
+  parcelType: string
   date: Date
-  from: String
-  to: String
-  description: String
-  userId: String,
-  creationDate: number,
+  from: string
+  to: string
+  description: string
+  userId: string
+  creationDate: number
   associatedRequests: Request[]
 }
 
 export const useAppStore = defineStore('app', {
   state: () => ({
-    requestsList: [] as Request[],
+    requestsList: [] as Request[]
   }),
   actions: {
-    addRequest(request: Request) {
-      const savedRequests = localStorage.getItem('requests');
-      if(savedRequests){
-        localStorage.setItem('requests', JSON.stringify([...JSON.parse(savedRequests), request]));
-      } else{
-        localStorage.setItem('requests', JSON.stringify([request]));
+    addRequest (request: Request) {
+      const savedRequests = localStorage.getItem('requests')
+      if (savedRequests) {
+        localStorage.setItem('requests', JSON.stringify([...JSON.parse(savedRequests), request]))
+      } else {
+        localStorage.setItem('requests', JSON.stringify([request]))
       }
     },
-    fetchRequests(userId: String | null){
-      function sortByDate(array : Request[]){
-        array.sort((a,b) =>
-          {
-            if(a.creationDate < b.creationDate) {
-              return -1;
-            } else if (a.creationDate > b.creationDate){
-              return 1;
-            } else return 0;
-          }
+    fetchRequests (userId: string | null) {
+      function sortByDate (array: Request[]) {
+        array.sort((a, b) => {
+          if (a.creationDate < b.creationDate) {
+            return -1
+          } else if (a.creationDate > b.creationDate) {
+            return 1
+          } else return 0
+        }
         )
-        return array;
+        return array
       }
 
-      let requestsList = [] as Request[];
-      const savedRequests = localStorage.getItem('requests');
-      if(savedRequests){
-        requestsList = JSON.parse(savedRequests);
-      } else{
-        requestsList = [];
+      let requestsList = [] as Request[]
+      const savedRequests = localStorage.getItem('requests')
+      if (savedRequests) {
+        requestsList = JSON.parse(savedRequests)
+      } else {
+        requestsList = []
       }
 
-      if(requestsList.length && userId){
-        requestsList = requestsList.filter((request) => request.userId === userId);
+      if ((requestsList.length > 0) && userId) {
+        requestsList = requestsList.filter((request) => request.userId === userId)
       }
       requestsList.forEach((request) => {
         request.associatedRequests = requestsList.filter((filteredRequest) =>
-          request.userId !== filteredRequest.userId
-          && request.from === filteredRequest.from
-          && request.to === filteredRequest.to
-          && request.type === filteredRequest.type
-        );
+          request.userId !== filteredRequest.userId &&
+          request.from === filteredRequest.from &&
+          request.to === filteredRequest.to &&
+          request.type === filteredRequest.type
+        )
       })
-      this.requestsList = sortByDate(requestsList);
+      this.requestsList = sortByDate(requestsList)
     }
-  },
+  }
 })
